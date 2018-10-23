@@ -71,6 +71,14 @@
     dsa_control_argument: "{{ dsa_control_argument }} 'groupid:{{ group_id }}'"
   when: group_id != none
 
+- set_fact:
+    dsa_control_argument: "{{ dsa_control_argument }} 'relaygroup:{{ relay_group_name }}'"
+  when: relay_group_name != none
+
+- set_fact:
+    dsa_control_argument: "{{ dsa_control_argument }} 'relaygroupid:{{ relay_group_id }}'"
+  when: relay_group_id != none
+
 # *********************************************************************
 # * Activate DSA when it's not activated or forecd to reactivate
 # *********************************************************************

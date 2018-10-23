@@ -6,13 +6,13 @@ An Ansible playbook for the Deep Security Agent. This playbook allows you to eas
 
 This is a community project that is supported by the Trend Micro Deep Security team.
 
-Tutorials, feature-specific help, and other information about Deep Security is available from the [Deep Security Help Center](https://help.deepsecurity.trendmicro.com/Welcome.html). 
+Tutorials, feature-specific help, and other information about Deep Security is available from the [Deep Security Help Center](https://help.deepsecurity.trendmicro.com/Welcome.html).
 
 For Deep Security specific issues, please use the regular Trend Micro support channels. For issues with the code in this repository, please [open an issue here on GitHub](https://github.com/deep-security/ansible/issues).
 
 ## Requirements
 
-All of the tasks in this repository require a working Deep Security infrastructure. The key component is the Trend Micro Deep Security Manager. The Deep Security Agents (which these playbooks help you manage) do the heavy lifting but the Deep Security Manager gives the orders. 
+All of the tasks in this repository require a working Deep Security infrastructure. The key component is the Trend Micro Deep Security Manager. The Deep Security Agents (which these playbooks help you manage) do the heavy lifting but the Deep Security Manager gives the orders.
 
 There are no specific technical requirements beyond a standard Ansible deployment.
 
@@ -153,6 +153,8 @@ policy_id | String | ID of the Deep Security Policy to be assigned to the Agents
 policy_name | String | Name of the Deep Security Policy to be assigned to the Agents. <br /> **Will be ignored if policy_id has been set.** | Base Policy
 tenant_id | String | In a multi-tenant installation (like Deep Security as a Service), this identifies the tenant account to register the Agent with. <br /> **Multi-tenancy only** | 111A111A-1A1A-11AA-AAA-11AA11111111
 token/tenant_password | String | In a multi-tenant installation (like Deep Security as a Service), this identifies the tenant account to register the Agent with. In latest Deep Security Manager, "tenant_password" has been replaced with "token". "tenant_password" has been kept for backwards compatibility.<br /> **Multi-tenancy only** | 111A111A-1A1A-11AA-AAA-11AA11111111
+relay_group_name | String | Name of the Deep Security Relay Group to be assigned to the Agents. | Some-Relay-Group
+relay_group_id | String | ID of the Deep Security Relay Group to be assigned to the Agents. | 123
 
 
 

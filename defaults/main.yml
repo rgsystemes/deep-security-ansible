@@ -23,7 +23,7 @@ dsm_agent_activation_port: 443
 # For multi-tenant deployments of Deep Security (such as Deep Security as a Service), every tenant/organization
 #    is assigned a unique 'tenant_id' and 'token' that is only used for agent activation. You can
 #    find this info from the Support/Help > Deployment Scripts menu in the Deep Security Manager. Select any agent
-#    and then enable "Activate Agent automatically after installation". This places the tenant_id and 
+#    and then enable "Activate Agent automatically after installation". This places the tenant_id and
 #    token in the script the wizard is building for you.
 tenant_id:
 tenant_password:
@@ -45,3 +45,7 @@ group_id:
 
 # Whether to force re-activation even Deep Security Agent has been activated
 force_reactivation: false
+
+# Relay group
+relay_group_name:
+relay_group_id:
