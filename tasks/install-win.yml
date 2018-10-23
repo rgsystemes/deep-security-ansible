@@ -60,16 +60,16 @@
 # *********************************************************************
 # DSA MSI installer will prevent downgrade but allow upgrade. No operation is performed if version is equals.
 - name: Install the Deep Security agent
-  win_shell: Start-Process -Wait -FilePath msiexec -ArgumentList /i, "{{ agent_local_path }}", /qn, /l*v, "dsa_install.log"
+  win_shell: (Start-Process -PassThru -Wait -FilePath msiexec -ArgumentList /i, "{{ agent_local_path }}", /qn, /l*v, "dsa_install.log").WaitForExit()
 
 - name: Make sure the agent has gathered the required metadata
-  pause: 
+  pause:
     seconds: 5
 
 # *********************************************************************
 # * Make sure the service is running
 # *********************************************************************
-- name: Get service 'ds_agent' status 
+- name: Get service 'ds_agent' status
   win_shell: Get-WmiObject win32_service -Filter "Name = 'ds_agent' AND State = 'Running'"
   register: result
 
