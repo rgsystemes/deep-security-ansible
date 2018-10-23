@@ -9,42 +9,42 @@
 # *********************************************************************
 # * Detect the platform architecture and package manager
 # *********************************************************************
-- name: Setting facts (apt) 
+- name: Setting facts (apt)
   set_fact:
     agent_local_path: /tmp/ds_agent.deb
   when: ansible_pkg_mgr == "apt"
 
-- name: Setting facts (yum, zypper) 
+- name: Setting facts (yum, zypper)
   set_fact:
     agent_local_path: /tmp/ds_agent.rpm
   when: ansible_pkg_mgr == "yum" or ansible_pkg_mgr == "zypper"
 
-- name: Setting facts (Amazon Linux) 
+- name: Setting facts (Amazon Linux)
   set_fact:
     agent_relative_path: software/agent/amzn1/{{ ansible_architecture }}
   when: (ansible_kernel | regex_search('(amzn1)')) == "amzn1"
 
-- name: Setting facts (Amazon Linux 2) 
+- name: Setting facts (Amazon Linux 2)
   set_fact:
     agent_relative_path: software/agent/amzn2/{{ ansible_architecture }}
-  when: (ansible_kernel | regex_search('(amzn2)')) == "amzn2"  
+  when: (ansible_kernel | regex_search('(amzn2)')) == "amzn2"
 
-- name: Setting facts (CentOS, RHEL) 
+- name: Setting facts (CentOS, RHEL)
   set_fact:
     agent_relative_path: software/agent/RedHat_EL{{ ansible_distribution_major_version }}/{{ ansible_architecture }}
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
-- name: Setting facts (Debian) 
+- name: Setting facts (Debian)
   set_fact:
     agent_relative_path: software/agent/Debian_{{ ansible_distribution_major_version }}/{{ ansible_architecture }}
   when: ansible_distribution == "Debian"
 
-- name: Setting facts (Ubuntu) 
+- name: Setting facts (Ubuntu)
   set_fact:
     agent_relative_path: software/agent/Ubuntu_{{ ansible_distribution_major_version }}.04/{{ ansible_architecture }}
   when: ansible_distribution == "Ubuntu"
 
-- name: Setting facts (SuSE) 
+- name: Setting facts (SuSE)
   set_fact:
     agent_relative_path: software/agent/SuSE_{{ ansible_distribution_major_version }}/{{ ansible_architecture }}
   when: ansible_distribution == "SLES"
@@ -59,24 +59,56 @@
     agent_relative_path: software/agent/Oracle_OL{{ ansible_distribution_major_version }}/{{ ansible_architecture }}
   when: ansible_distribution == "OracleLinux"
 
-- debug: 
-    msg: 
+- name: Setting facts (RHEL5 flag)
+  set_fact:
+    is_rhel5: '{{ ansible_os_family == "RedHat" and ansible_distribution_major_version == "5" }}'
+
+- debug:
+    msg:
       - "agent_local_path: {{ agent_local_path }}"
       - "agent_relative_path: {{ agent_relative_path }}"
 
 # *********************************************************************
 # * Download Deep Security agent from Deep Security manager
 # *********************************************************************
-- debug:
-    msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
+- when: not is_rhel5
+  block:
+    - debug:
+        msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
 
-- name: Download the Deep Security agent
-  get_url: 
-    url: "https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/" 
-    dest: "{{ agent_local_path }}"
-    validate_certs: no
-    timeout: 300
-    force: yes
+    - name: Download the Deep Security agent
+      get_url:
+        url: "https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
+        dest: "{{ agent_local_path }}"
+        validate_certs: no
+        timeout: 300
+        force: yes
+
+# *********************************************************************
+# * Copy Deep Security agent from Playbook directory for RHEL5
+# *********************************************************************
+- when: is_rhel5
+  block:
+    - debug:
+        msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/ to playbook local."
+
+    - name: Download the Deep Security agent to playbook local
+      local_action: get_url
+      args:
+        url: "https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
+        dest: "{{ role_path }}/files/deep-security-agent.el5.{{ ansible_architecture }}.rpm"
+        validate_certs: no
+        timeout: 300
+        force: false
+
+    - debug:
+        msg: "Copy from {{ playbook_dir }}/files/deep-security-agent.el5.{{ ansible_architecture }}.rpm to target host"
+
+    - name: Copy the Deep Security agent from playbook local
+      copy:
+        src: "{{ role_path }}/files/deep-security-agent.el5.{{ ansible_architecture }}.rpm"
+        dest: "{{ agent_local_path }}"
+        force: true
 
 - stat:
     path: "{{ agent_local_path }}"
@@ -95,24 +127,33 @@
 # *********************************************************************
 # * Install the agent
 # *********************************************************************
-# Both RPM and DPKG managers will do upgrade if downloaded package version is newer than installed. 
+# Both RPM and DPKG managers will do upgrade if downloaded package version is newer than installed.
 # If versions are equals, no operation. If older than installed, some managers will throw error.
 - name: Install the Deep Security agent (yum)
-  yum: 
+  yum:
     name: "{{ agent_local_path }}"
     state: present
-  when: ansible_pkg_mgr == "yum"
+  when: ansible_pkg_mgr == "yum" and not is_rhel5
+  become: true
+
+- name: Install the Deep Security agent(yum, RHEL5)
+  command: 'yum localinstall --nogpgcheck -y "{{ agent_local_path }}"'
+  args:
+    warn: false
+  register: yum_localinstall_rhel5
+  changed_when: '"Nothing to do" not in yum_localinstall_rhel5.stdout'
+  when: is_rhel5
   become: true
 
 - name: Install the Deep Security agent (apt)
-  apt: 
+  apt:
     deb: "{{ agent_local_path }}"
     state: present
   when: ansible_pkg_mgr == "apt"
   become: true
 
 - name: Install the Deep Security agent (zypper)
-  zypper: 
+  zypper:
     name: "{{ agent_local_path }}"
     state: present
     disable_gpg_check: yes
@@ -120,7 +161,7 @@
   become: true
 
 - name: Make sure the agent has gathered the required metadata
-  pause: 
+  pause:
     seconds: 5
 
 # *********************************************************************
@@ -128,9 +169,9 @@
 # *********************************************************************
 
 # We ignore "[warnning]Consider using service module rather than running service" here because there's no proper service checking function in "Service" module
-- name: Get service 'ds_agent' status 
-  shell: "service ds_agent status"
-  args: 
+- name: Get service 'ds_agent' status
+  shell: "/sbin/service ds_agent status"
+  args:
     warn: false
   register: result
   become: true
