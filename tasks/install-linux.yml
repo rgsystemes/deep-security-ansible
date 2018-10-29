@@ -90,9 +90,9 @@
 - when: is_rhel5
   block:
     - debug:
-        msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/ to playbook local."
+        msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/ to ansible local."
 
-    - name: Download the Deep Security agent to playbook local
+    - name: Download the Deep Security agent to ansible local
       local_action: get_url
       args:
         url: "https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
@@ -102,9 +102,9 @@
         force: false
 
     - debug:
-        msg: "Copy from {{ playbook_dir }}/files/deep-security-agent.el5.{{ ansible_architecture }}.rpm to target host"
+        msg: "Copy {{ role_path }}/files/deep-security-agent.el5.{{ ansible_architecture }}.rpm to target host"
 
-    - name: Copy the Deep Security agent from playbook local
+    - name: Copy the Deep Security agent from ansible local
       copy:
         src: "{{ role_path }}/files/deep-security-agent.el5.{{ ansible_architecture }}.rpm"
         dest: "{{ agent_local_path }}"
