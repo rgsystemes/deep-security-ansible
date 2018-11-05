@@ -50,9 +50,8 @@
     - name: "Create /var/www/dsm-agents/{{ agent_relative_path }}"
       local_action: file
       args:
-        path: '/var/www/dsm-agents/{{ agent_relative_path }}'
+        path: '/var/www/dsm-agents/{{ agent_relative_path | dirname }}'
         state: directory
-      become: true
 
     - name: Download the Deep Security agent to ansible local
       local_action: get_url
@@ -63,7 +62,6 @@
         timeout: 300
         force: false
         use_proxy: false
-      become: true
 
     - debug:
         msg: "/var/www/dsm-agents/{{ agent_relative_path }} to target host"
