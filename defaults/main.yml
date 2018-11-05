@@ -42,6 +42,7 @@ policy_name:
 
 # The ID of the group you want to initialize the agent with.
 group_id:
+group_name:
 
 # Whether to force re-activation even Deep Security Agent has been activated
 force_reactivation: false

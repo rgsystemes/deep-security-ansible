@@ -67,6 +67,10 @@
   when: policy_name != none
 
 - set_fact:
+    dsa_control_argument: "{{ dsa_control_argument }} 'group:{{ group_name }}'"
+  when: group_name != none
+
+- set_fact:
     dsa_control_argument: "{{ dsa_control_argument }} 'groupid:{{ group_id }}'"
   when: group_id != none
 
