@@ -40,28 +40,41 @@
     validate_certs: no
     timeout: 300
     force: yes
+    use_proxy: false
   register: download_agent
   ignore_errors: true
 
+# Tower上でNginxなどで /var/www/dsm-agents を公開している前提
 - when: download_agent is failed
   block:
+    - name: "Create /var/www/dsm-agents/{{ agent_relative_path }}"
+      local_action: file
+      args:
+        path: '/var/www/dsm-agents/{{ agent_relative_path }}'
+        state: directory
+      become: true
+
     - name: Download the Deep Security agent to ansible local
       local_action: get_url
       args:
         url: "https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
-        dest: "{{ role_path }}/files/win{{ ansible_architecture[:2] }}"
+        dest: '/var/www/dsm-agents/{{ agent_relative_path }}'
         validate_certs: no
         timeout: 300
         force: false
+        use_proxy: false
+      become: true
 
     - debug:
-        msg: "Copy {{ role_path }}/files/win{{ ansible_architecture[:2] }} to target host"
+        msg: "/var/www/dsm-agents/{{ agent_relative_path }} to target host"
 
-    - name: Copy the Deep Security agent from ansible local
-      win_copy:
-        src: "{{ role_path }}/files/win{{ ansible_architecture[:2] }}"
+    - name: Download the Deep Security agent from ansible local
+      win_get_url:
+        url: "http://{{ dsm_agent_download_proxy_hostname }}:{{ dsm_agent_download_proxy_port }}/{{ agent_relative_path }}/"
         dest: "{{ agent_local_path }}"
-        force: true
+        timeout: 300
+        force: yes
+        use_proxy: false
 
 - win_stat:
     path: "{{ agent_local_path }}"

@@ -50,3 +50,7 @@ force_reactivation: false
 # Relay group
 relay_group_name:
 relay_group_id:
+
+# Towerホスト上に設置するエージェント配信用サーバのホスト名とポート
+dsm_agent_download_proxy_hostname:
+dsm_agent_download_proxy_port:
