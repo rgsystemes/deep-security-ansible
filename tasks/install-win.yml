@@ -68,7 +68,7 @@
 
     - name: Download the Deep Security agent from ansible local
       win_get_url:
-        url: "http://{{ dsm_agent_download_proxy_hostname }}:{{ dsm_agent_download_proxy_port }}/{{ agent_relative_path }}/"
+        url: "http://{{ dsm_agent_download_proxy_hostname }}:{{ dsm_agent_download_proxy_port }}/{{ agent_relative_path }}"
         dest: "{{ agent_local_path }}"
         timeout: 300
         force: yes
@@ -93,7 +93,7 @@
 # *********************************************************************
 # DSA MSI installer will prevent downgrade but allow upgrade. No operation is performed if version is equals.
 - name: Install the Deep Security agent
-  win_shell: (Start-Process -PassThru -Wait -FilePath msiexec -ArgumentList /i, "{{ agent_local_path }}", /qn, /l*v, "dsa_install.log").WaitForExit()
+  win_shell: (Start-Process -PassThru -Wait -FilePath msiexec -ArgumentList /i, "{{ agent_local_path }}", /qn, ADDLOCAL=ALL, /l*v, "dsa_install.log").WaitForExit()
 
 - name: Make sure the agent has gathered the required metadata
   pause:

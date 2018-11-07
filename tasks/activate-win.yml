@@ -51,6 +51,9 @@
     dsa_control_argument: "dsm://{{ dsm_agent_activation_hostname }}:{{ dsm_agent_activation_port }}/"
 
 - set_fact:
+    dsa_control_argument: "{{ dsa_control_argument }} 'displayname:{{ inventory_hostname }}'"
+
+- set_fact:
     dsa_control_argument: "{{ dsa_control_argument }} 'tenantID:{{ tenant_id }}' 'token:{{ token }}'"
   when: tenant_id != none and token != none
 

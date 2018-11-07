@@ -112,7 +112,7 @@
 
     - name: Download the Deep Security agent from ansible local
       get_url:
-        url: "http://{{ dsm_agent_download_proxy_hostname }}:{{ dsm_agent_download_proxy_port }}/{{ agent_relative_path }}/"
+        url: "http://{{ dsm_agent_download_proxy_hostname }}:{{ dsm_agent_download_proxy_port }}/{{ agent_relative_path }}"
         dest: "{{ agent_local_path }}"
         timeout: 300
         force: yes
@@ -187,7 +187,7 @@
 - name: Check service is on
   fail:
     msg: "Failed to start agent service"
-  when: (result.stdout | regex_search('(running)')) != "running"
+  when: '"running" not in result.stdout and "実行中" not in result.stdout'
 
 - debug:
     msg: "ds_agent package installed successfully"
