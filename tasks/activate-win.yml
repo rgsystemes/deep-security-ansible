@@ -31,7 +31,7 @@
 - set_fact:
     isActivated: false
 
-- win_shell: "& 'C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_query.cmd' -c GetAgentStatus agentCertHash"
+- win_shell: "chcp 437 | Out-null; & 'C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_query.cmd' -c GetAgentStatus agentCertHash"
   register: certHash
 
 - set_fact:
@@ -93,7 +93,7 @@
         - "Activate DSA when it's not activated or forecd to reactivate."
         - "force_reactivation: {{ force_reactivation }}"
 
-- win_shell: "{{ item }}"
+- win_shell: "chcp 437 | Out-null; {{ item }}"
   with_items:
     - "& 'C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_control' -r"
     - "& 'C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_control' -a {{ dsa_control_argument }}"

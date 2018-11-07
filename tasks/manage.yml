@@ -50,7 +50,7 @@
   set_fact:
     dsa_control_argument: "-m 'AntiMalwareManualScan:true'"
   when: operation == 'scan-for-malware'
-  
+
 # *********************************************************************
 # * Set a policy by name
 # *********************************************************************
@@ -58,7 +58,7 @@
   set_fact:
     dsa_control_argument: "-m 'policy:{{ policy_name }}'"
   when: operation == 'set-policy-by-name'
-  
+
 # *********************************************************************
 # * Set a policy by ID
 # *********************************************************************
@@ -92,13 +92,13 @@
   when: ansible_os_family == "Windows"
 
 - fail:
-    msg: 
+    msg:
         - "Could not find command /opt/ds_agent/dsa_query to query DSA certificate."
         - "Please make sure Deep Security Agent has been installed"
   when: ansible_os_family != "Windows" and dsaQueryLinux.stat.exists != true
 
 - fail:
-    msg: 
+    msg:
         - "Could not find command C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_query.cmd to query DSA certificate."
         - "Please make sure Deep Security Agent has been installed"
   when: ansible_os_family == "Windows" and dsaQueryWin.stat.exists != true
@@ -108,10 +108,10 @@
 # *********************************************************************
 - debug:
     msg: "Run dsa_control with arguments: {{ dsa_control_argument }}"
-    
+
 - shell: /opt/ds_agent/dsa_control {{ dsa_control_argument }}
   when: ansible_os_family != "Windows"
   become: true
 
-- win_shell: "& 'C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_control' {{ dsa_control_argument }}"
+- win_shell: "chcp 437 | Out-null; & 'C:\\Program Files\\Trend Micro\\Deep Security Agent\\dsa_control' {{ dsa_control_argument }}"
   when: ansible_os_family == "Windows"
