@@ -87,7 +87,6 @@
 
 # *********************************************************************
 # * Copy Deep Security agent from Playbook directory for RHEL5
-# * Tower上でNginxなどで /var/www/dsm-agents を公開している前提
 # *********************************************************************
 - when: is_rhel5
   block:
@@ -108,15 +107,13 @@
         use_proxy: false
 
     - debug:
-        msg: "/var/www/dsm-agents/{{ agent_relative_path }} to target host"
+        msg: "Copy /var/www/dsm-agents/{{ agent_relative_path }} to target host"
 
-    - name: Download the Deep Security agent from ansible local
-      get_url:
-        url: "http://{{ dsm_agent_download_proxy_hostname }}:{{ dsm_agent_download_proxy_port }}/{{ agent_relative_path }}"
+    - name: Copy the Deep Security agent from ansible local
+      copy:
+        src: '/var/www/dsm-agents/{{ agent_relative_path }}'
         dest: "{{ agent_local_path }}"
-        timeout: 300
-        force: yes
-        use_proxy: false
+        force: true
 
 - stat:
     path: "{{ agent_local_path }}"
