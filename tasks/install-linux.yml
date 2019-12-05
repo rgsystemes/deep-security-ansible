@@ -14,10 +14,10 @@
     agent_local_path: /tmp/ds_agent.deb
   when: ansible_pkg_mgr == "apt"
 
-- name: Setting facts (yum, zypper)
+- name: Setting facts (yum, zypper, dnf)
   set_fact:
     agent_local_path: /tmp/ds_agent.rpm
-  when: ansible_pkg_mgr == "yum" or ansible_pkg_mgr == "zypper"
+  when: ansible_pkg_mgr in ["yum", "zypper", "dnf"]
 
 - name: Setting facts (Amazon Linux)
   set_fact:
@@ -134,11 +134,11 @@
 # *********************************************************************
 # Both RPM and DPKG managers will do upgrade if downloaded package version is newer than installed.
 # If versions are equals, no operation. If older than installed, some managers will throw error.
-- name: Install the Deep Security agent (yum)
-  yum:
+- name: Install the Deep Security agent (yum, dnf)
+  package:
     name: "{{ agent_local_path }}"
     state: present
-  when: ansible_pkg_mgr == "yum" and not is_rhel5
+  when: ansible_pkg_mgr in ["yum", "dnf"] and not is_rhel5
   become: true
 
 - name: Install the Deep Security agent(yum, RHEL5)
