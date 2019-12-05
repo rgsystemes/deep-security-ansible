@@ -152,7 +152,7 @@
 
 # Use command module to avoid dnf error on CentOS 8 with Ansible 2.7
 - name: Install the Deep Security agent(dnf)
-  command: 'dnf install --nogpgcheckk -y "{{ agent_local_path }}"'
+  command: 'dnf install --nogpgcheck -y "{{ agent_local_path }}"'
   args:
     warn: false
   register: dnf_install
