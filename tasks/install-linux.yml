@@ -134,11 +134,11 @@
 # *********************************************************************
 # Both RPM and DPKG managers will do upgrade if downloaded package version is newer than installed.
 # If versions are equals, no operation. If older than installed, some managers will throw error.
-- name: Install the Deep Security agent (yum, dnf)
-  package:
+- name: Install the Deep Security agent (yum)
+  yum:
     name: "{{ agent_local_path }}"
     state: present
-  when: ansible_pkg_mgr in ["yum", "dnf"] and not is_rhel5
+  when: ansible_pkg_mgr == "yum" and not is_rhel5
   become: true
 
 - name: Install the Deep Security agent(yum, RHEL5)
@@ -148,6 +148,16 @@
   register: yum_localinstall_rhel5
   changed_when: '"Nothing to do" not in yum_localinstall_rhel5.stdout'
   when: is_rhel5
+  become: true
+
+# Use command module to avoid dnf error on CentOS 8 with Ansible 2.7
+- name: Install the Deep Security agent(dnf)
+  command: 'dnf install --nogpgcheckk -y "{{ agent_local_path }}"'
+  args:
+    warn: false
+  register: dnf_install
+  changed_when: '"Nothing to do" not in dnf_install.stdout'
+  when: ansible_pkg_mgr == "dnf"
   become: true
 
 - name: Install the Deep Security agent (apt)
