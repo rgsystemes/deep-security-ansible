@@ -68,15 +68,19 @@
 # * Download Deep Security agent from Deep Security manager
 # *********************************************************************
 - debug:
-    msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/"
+    msg: "Download from: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/{{ dsm_package_download_name }}?{{ dsm_agent_download_tenantid }}"
+
+# - name: Download the Deep Security agent
+#   become: yes
+#   get_url: 
+#     url: https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/{{ dsm_package_download_name }}
+#     dest: "{{ agent_local_path }}"
+#     #validate_certs: no
+#     #timeout: 300
+#     #force: yes
 
 - name: Download the Deep Security agent
-  get_url: 
-    url: "https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/" 
-    dest: "{{ agent_local_path }}"
-    validate_certs: no
-    timeout: 300
-    force: yes
+  shell: 'curl -H "Agent-Version-Control: on" https://{{ dsm_agent_download_hostname }}:{{ dsm_agent_download_port }}/{{ agent_relative_path }}/{{ dsm_package_download_name }}?{{ dsm_agent_download_tenantid }} -o {{ agent_local_path }} --silent --tlsv1.2'
 
 - stat:
     path: "{{ agent_local_path }}"
