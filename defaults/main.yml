@@ -12,7 +12,7 @@
 #   this data through the 'dsm_agent_download_hostname' & 'dsm_agent_download_port' attributes.
 dsm_agent_download_hostname: app.deepsecurity.trendmicro.com
 dsm_agent_download_port: 443
-
+dsm_agent_download_tenantid: 
 # Deep Security agents activate on a different port than the admin interface. For Marketplace and
 #    software deployments, 'dsm_agent_activation_hostname' is typically the same as 'dsm_agent_download_hostname'
 #    but 'dsm_agent_activation_port' is different than 'dsm_agent_download_port'. For Deep Security
